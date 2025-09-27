@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF & Image Tools - All-in-One Converter</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PDF & Image Tools - All-in-One Converter</h1>
+            <p class="subtitle">Convert, resize, compress images and PDFs, Remove PDF passwords</p>
+        </header>
+        
+        <div class="csp-info">
+            <strong>Note:</strong> This tool uses external libraries for PDF processing. Works completely in browser.
+        </div>
+        
+        <div class="tool-toggle">
+            <div class="toggle-btn active" data-target="pdf-to-jpg">PDF to JPG</div>
+            <div class="toggle-btn" data-target="jpg-to-pdf">JPG to PDF</div>
+            <div class="toggle-btn" data-target="resize-tool">Resize Tool</div>
+            <div class="toggle-btn" data-target="compress-tool">Compress Tool</div>
+            <div class="toggle-btn" data-target="password-remove">PDF Password Remove</div>
+        </div>
+        
+        <div class="content">
+            <!-- PDF to JPG Section -->
+            <div class="tool-section active" id="pdf-to-jpg">
+                <div class="upload-area" id="pdfUploadArea">
+                    <div class="upload-icon">📄</div>
+                    <p class="upload-text">Drag & Drop your PDF file here</p>
+                    <p>or</p>
+                    <button class="btn" id="pdfBrowseBtn">
+                        <i>📂</i> Browse PDF File
+                    </button>
+                    <input type="file" id="pdfFileInput" class="file-input" accept=".pdf">
+                </div>
+                
+                <div class="preview-section">
+                    <h3 class="preview-title">PDF Pages Preview</h3>
+                    <div class="preview-container" id="pdfPreviewContainer">
+                        <!-- PDF pages preview will be added here -->
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-convert" id="convertPdfToJpgBtn">
+                            <span class="loading" id="pdfConvertLoading" style="display: none;"></span>
+                            <i>🔄</i> Convert to JPG
+                        </button>
+                        <button class="btn btn-clear" id="clearPdfBtn">
+                            <i>🗑️</i> Clear PDF
+                        </button>
+                    </div>
+                    
+                    <div class="download-options" id="jpgDownloadOptions">
+                        <h3 class="preview-title">Download JPG Images</h3>
+                        <div id="jpgDownloadButtons">
+                            <!-- JPG download buttons will be added here -->
+                        </div>
+                        <button class="btn btn-download" id="downloadAllJpgBtn">
+                            <i>📥</i> Download All as ZIP
+                        </button>
+                    </div>
+                    
+                    <div class="status-message" id="pdfStatusMessage"></div>
+                </div>
+            </div>
+            
+            <!-- JPG to PDF Section -->
+            <div class="tool-section" id="jpg-to-pdf">
+                <div class="upload-area" id="jpgUploadArea">
+                    <div class="upload-icon">🖼️</div>
+                    <p class="upload-text">Drag & Drop your JPG images here</p>
+                    <p>or</p>
+                    <button class="btn" id="jpgBrowseBtn">
+                        <i>📂</i> Browse JPG Files
+                    </button>
+                    <input type="file" id="jpgFileInput" class="file-input" accept="image/jpeg, image/jpg" multiple>
+                </div>
+                
+                <div class="preview-section">
+                    <h3 class="preview-title">Selected JPG Images</h3>
+                    <div class="preview-container" id="jpgPreviewContainer">
+                        <!-- JPG preview images will be added here -->
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-convert" id="convertJpgToPdfBtn">
+                            <span class="loading" id="jpgConvertLoading" style="display: none;"></span>
+                            <i>🔄</i> Convert to PDF
+                        </button>
+                        <button class="btn btn-clear" id="clearJpgBtn">
+                            <i>🗑️</i> Clear All
+                        </button>
+                        <a class="btn btn-download" id="downloadPdfBtn" style="display: none;">
+                            <i>📥</i> Download PDF
+                        </a>
+                    </div>
+                    
+                    <div class="status-message" id="jpgStatusMessage"></div>
+                </div>
+            </div>
+            
+            <!-- Resize Tool Section -->
+            <div class="tool-section" id="resize-tool">
+                <div class="upload-area" id="resizeUploadArea">
+                    <div class="upload-icon">📏</div>
+                    <p class="upload-text">Drag & Drop your image here to resize</p>
+                    <p>or</p>
+                    <button class="btn" id="resizeBrowseBtn">
+                        <i>📂</i> Browse Image
+                    </button>
+                    <input type="file" id="resizeFileInput" class="file-input" accept="image/*">
+                </div>
+                
+                <div class="tool-options" id="resizeOptions">
+                    <h3 class="preview-title">Resize Options</h3>
+                    
+                    <div class="tool-controls">
+                        <div class="control-group">
+                            <label for="widthInput">Width (pixels)</label>
+                            <input type="number" id="widthInput" min="1" placeholder="Auto">
+                        </div>
+                        
+                        <div class="control-group">
+                            <label for="heightInput">Height (pixels)</label>
+                            <input type="number" id="heightInput" min="1" placeholder="Auto">
+                        </div>
+                        
+                        <div class="control-group">
+                            <label for="aspectRatio">Maintain Aspect Ratio</label>
+                            <select id="aspectRatio">
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label for="resizeQuality">Quality</label>
+                            <select id="resizeQuality">
+                                <option value="1.0">High (100%)</option>
+                                <option value="0.8" selected>Good (80%)</option>
+                                <option value="0.6">Medium (60%)</option>
+                                <option value="0.4">Low (40%)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="size-presets">
+                        <div class="size-preset" data-width="800" data-height="600">800×600</div>
+                        <div class="size-preset" data-width="1024" data-height="768">1024×768</div>
+                        <div class="size-preset" data-width="1920" data-height="1080">1920×1080</div>
+                        <div class="size-preset" data-width="1280" data-height="720">1280×720</div>
+                        <div class="size-preset" data-width="640" data-height="480">640×480</div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-resize" id="resizeImageBtn">
+                            <span class="loading" id="resizeLoading" style="display: none;"></span>
+                            <i>📏</i> Resize Image
+                        </button>
+                        <button class="btn btn-clear" id="clearResizeBtn">
+                            <i>🗑️</i> Clear Image
+                        </button>
+                        <a class="btn btn-download" id="downloadResizedBtn" style="display: none;">
+                            <i>📥</i> Download Resized Image
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="comparison-container" id="resizeComparisonContainer">
+                    <!-- Resize comparison will be added here -->
+                </div>
+                
+                <div class="status-message" id="resizeStatusMessage"></div>
+            </div>
+            
+            <!-- Compress Tool Section -->
+            <div class="tool-section" id="compress-tool">
+                <div class="upload-area" id="compressUploadArea">
+                    <div class="upload-icon">🗜️</div>
+                    <p class="upload-text">Drag & Drop your image here to compress</p>
+                    <p>or</p>
+                    <button class="btn" id="compressBrowseBtn">
+                        <i>📂</i> Browse Image
+                    </button>
+                    <input type="file" id="compressFileInput" class="file-input" accept="image/*">
+                </div>
+                
+                <div class="tool-options" id="compressOptions">
+                    <h3 class="preview-title">Compression Options</h3>
+                    
+                    <div class="compression-method">
+                        <div class="method-tabs">
+                            <div class="method-tab active" data-method="quality">Quality Based</div>
+                            <div class="method-tab" data-method="target">Target Size</div>
+                        </div>
+                        
+                        <!-- Quality Based Compression -->
+                        <div class="method-content active" id="quality-method">
+                            <div class="tool-controls">
+                                <div class="control-group">
+                                    <label for="compressionLevel">Compression Level</label>
+                                    <input type="range" id="compressionLevel" min="0.1" max="1.0" step="0.1" value="0.7">
+                                    <div id="compressionValue">70% (Good Quality)</div>
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="maxWidth">Max Width (pixels)</label>
+                                    <input type="number" id="maxWidth" min="1" placeholder="Original size">
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="maxHeight">Max Height (pixels)</label>
+                                    <input type="number" id="maxHeight" min="1" placeholder="Original size">
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="outputFormat">Output Format</label>
+                                    <select id="outputFormat">
+                                        <option value="image/jpeg">JPEG</option>
+                                        <option value="image/png">PNG</option>
+                                        <option value="image/webp">WebP</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="quality-presets">
+                                <div class="quality-preset" data-quality="0.9">High Quality (90%)</div>
+                                <div class="quality-preset active" data-quality="0.7">Good Quality (70%)</div>
+                                <div class="quality-preset" data-quality="0.5">Medium Quality (50%)</div>
+                                <div class="quality-preset" data-quality="0.3">Low Quality (30%)</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Target Size Based Compression -->
+                        <div class="method-content" id="target-method">
+                            <div class="tool-controls">
+                                <div class="control-group">
+                                    <label for="targetSize">Target File Size (KB)</label>
+                                    <div class="target-size-control">
+                                        <input type="number" id="targetSize" min="1" placeholder="Enter size in KB">
+                                        <span>KB</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="targetMaxWidth">Max Width (pixels)</label>
+                                    <input type="number" id="targetMaxWidth" min="1" placeholder="Original size">
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="targetMaxHeight">Max Height (pixels)</label>
+                                    <input type="number" id="targetMaxHeight" min="1" placeholder="Original size">
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="targetOutputFormat">Output Format</label>
+                                    <select id="targetOutputFormat">
+                                        <option value="image/jpeg">JPEG</option>
+                                        <option value="image/png">PNG</option>
+                                        <option value="image/webp">WebP</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="target-size-presets">
+                                <div class="target-size-preset" data-size="50">50 KB</div>
+                                <div class="target-size-preset" data-size="100">100 KB</div>
+                                <div class="target-size-preset active" data-size="200">200 KB</div>
+                                <div class="target-size-preset" data-size="500">500 KB</div>
+                                <div class="target-size-preset" data-size="1000">1 MB</div>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label for="compressionPrecision">Compression Precision</label>
+                                <select id="compressionPrecision">
+                                    <option value="fast">Fast (Less Accurate)</option>
+                                    <option value="balanced" selected>Balanced</option>
+                                    <option value="precise">Precise (More Accurate)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-compress" id="compressImageBtn">
+                            <span class="loading" id="compressLoading" style="display: none;"></span>
+                            <i>🗜️</i> Compress Image
+                        </button>
+                        <button class="btn btn-clear" id="clearCompressBtn">
+                            <i>🗑️</i> Clear Image
+                        </button>
+                        <a class="btn btn-download" id="downloadCompressedBtn" style="display: none;">
+                            <i>📥</i> Download Compressed Image
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="comparison-container" id="compressComparisonContainer">
+                    <!-- Compression comparison will be added here -->
+                </div>
+                
+                <div class="compression-stats" id="compressionStats" style="display: none;">
+                    <div class="stat-item">
+                        <div class="stat-value" id="originalSize">0 KB</div>
+                        <div class="stat-label">Original Size</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="compressedSize">0 KB</div>
+                        <div class="stat-label">Compressed Size</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value compression-ratio" id="compressionRatio">0%</div>
+                        <div class="stat-label">Compression Ratio</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value size-reduction" id="sizeReduction">0%</div>
+                        <div class="stat-label">Size Reduction</div>
+                    </div>
+                </div>
+                
+                <div class="status-message" id="compressStatusMessage"></div>
+            </div>
+            
+            <!-- PDF Password Remove Section -->
+            <div class="tool-section" id="password-remove">
+                <div class="upload-area" id="passwordUploadArea">
+                    <div class="upload-icon">🔓</div>
+                    <p class="upload-text">Drag & Drop your password protected PDF file here</p>
+                    <p>or</p>
+                    <button class="btn" id="passwordBrowseBtn">
+                        <i>📂</i> Browse PDF File
+                    </button>
+                    <input type="file" id="passwordFileInput" class="file-input" accept=".pdf">
+                </div>
+                
+                <div class="tool-options" id="passwordOptions">
+                    <h3 class="preview-title">PDF Password Removal</h3>
+                    
+                    <div class="tool-controls">
+                        <div class="control-group">
+                            <label for="pdfPassword">PDF Password</label>
+                            <input type="password" id="pdfPassword" placeholder="Enter PDF password">
+                            <small class="hint">Enter the password to unlock the PDF</small>
+                        </div>
+                    </div>
+                    
+                    <div class="password-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">✅</div>
+                            <div class="feature-text">Remove owner password</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">✅</div>
+                            <div class="feature-text">Remove user password</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">✅</div>
+                            <div class="feature-text">Maintain original quality</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">✅</div>
+                            <div class="feature-text">100% secure - processing in browser</div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-convert" id="removePasswordBtn">
+                            <span class="loading" id="passwordRemoveLoading" style="display: none;"></span>
+                            <i>🔓</i> Remove Password
+                        </button>
+                        <button class="btn btn-clear" id="clearPasswordBtn">
+                            <i>🗑️</i> Clear PDF
+                        </button>
+                        <a class="btn btn-download" id="downloadUnlockedBtn" style="display: none;">
+                            <i>📥</i> Download Unlocked PDF
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="password-info">
+                    <h3 class="preview-title">How it works</h3>
+                    <div class="info-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Upload PDF</strong>
+                                <p>Select your password protected PDF file</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Enter Password</strong>
+                                <p>Provide the correct password to unlock</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Remove Protection</strong>
+                                <p>Tool will remove all password restrictions</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <strong>Download</strong>
+                                <p>Get your unlocked PDF file</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="status-message" id="passwordStatusMessage"></div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>PDF & Image Tools - All-in-One Converter &copy; 2023 | Secure offline processing</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
